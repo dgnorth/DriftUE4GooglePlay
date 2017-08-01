@@ -113,8 +113,19 @@ void FDriftGooglePlayAuthProvider::GetFriends(GetFriendsCallback callback)
 
 void FDriftGooglePlayAuthProvider::FillProviderDetails(DetailsAppender appender) const
 {
+#if 1 // The auth tokens given back by the Google Play APIs are not the ones we need
+    static const FString salt = TEXT("b3e9f581-ce1a-442a-80b6-9689d081d9e3");
+
+    auto username = FString::Printf(TEXT("%s"), *googleID);
+
+    appender(TEXT("provisional"), TEXT("true"));
+    appender(TEXT("username"), username);
+    // This is temporary until something useful is exposed from the SDK
+    appender(TEXT("password"), *FMD5::HashAnsiString(*(username + salt)));
+#else
     appender(TEXT("user_id"), googleID);
     appender(TEXT("id_token"), authToken);
+#endif
 }
 
 
